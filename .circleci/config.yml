@@ -1,16 +1,22 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: debian:stretch
+    machine: true
 
     steps:
       - checkout
 
       - run:
-          name: Greeting
-          command: echo Hello, world.
+          name: LogIn to docker hub
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
 
       - run:
-          name: Print the Current Time
-          command: date
+          name: Build image 
+          command: |
+            docker build --no-cache -t ccbash/ansible:$CIRCLE_BRANCH -f $(DIR)/$(FILE)$${SUFFIX} .
+      
+      - run: 
+          name: Push Image
+          command: |
+            docker push ccbash/ansible:$CIRCLE_BRANCH
